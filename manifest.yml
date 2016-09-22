@@ -1,0 +1,15 @@
+applications:
+- path: .
+  memory: 512M
+  instances: 1
+  domain: mybluemix.net
+  name: line-bot-kevin0916
+  host: line-bot-kevin0916
+  disk_quota: 1024M
+  services:
+  - line-bot-statica
+  - line-bot-visual-recognition
+  env:
+    CHANNEL_ID: '1480997547'
+    CHANNEL_SECRET: 006cfdc027564f5bd0bf8374691261e1
+    MID: u250c355222bd5f8cab9e1d6cb278b3c3
