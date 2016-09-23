@@ -1,3 +1,10 @@
+declared-services:
+  line-bot-statica:
+    label: statica
+    plan: starter
+  line-bot-visual-recognition:
+    label: watson_vision_combined
+    plan: free
 applications:
 - path: .
   memory: 512M

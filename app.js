@@ -1,28 +1,31 @@
-/*eslint-env node*/
+/**
+ * @file LINE BOT アプリ
+ * @author Ippei SUZUKI
+ */
 
-//------------------------------------------------------------------------------
-// node.js starter application for Bluemix
-//------------------------------------------------------------------------------
-
-// This application uses express as its web server
-// for more info, see: http://expressjs.com
+// モジュールを読込む。
+var context = require('./utils/context');
 var express = require('express');
+var logger = require('morgan');
+var bodyParser = require('body-parser');
+var routes = require('./routes');
 
-// cfenv provides access to your Cloud Foundry environment
-// for more info, see: https://www.npmjs.com/package/cfenv
-var cfenv = require('cfenv');
-
-// create a new express server
+// アプリケーションを作成する。
 var app = express();
+
+// ミドルウェアを設定する。
+app.use(logger('dev'));
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
 
 // serve the files out of ./public as our main files
 app.use(express.static(__dirname + '/public'));
 
-// get the app environment from Cloud Foundry
-var appEnv = cfenv.getAppEnv();
+// ルートを設定する。
+app.post('/callback', routes.callback);
 
-// start server on the specified port and binding host
-app.listen(appEnv.port, '0.0.0.0', function() {
-  // print a message when the server starts listening
-  console.log("server starting on " + appEnv.url);
+// リクエトを受付ける。
+app.listen(context.appEnv.port, '0.0.0.0', function() {
+    console.log('server starting on ' + context.appEnv.url);
 });
+
