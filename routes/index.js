@@ -58,7 +58,7 @@ var getFilename = function (contentDisposition) {
 }
 
 // 解析不可時のメッセージ
-var cantRecognize = function (content) { sendText("申し訳ありません。\n解析不能です", content); }
+var cantRecognize = function (content) { sendText("申し訳ありません。\n解析できませんでした。", content); }
 
 // 画像認識
 var visualRecognition = function (content) {
@@ -142,7 +142,8 @@ var visualRecognition = function (content) {
         } else {
             sendText('何が写ってるか解析します', content);
             context.visualRecognition.classify({
-                images_file: context.fs.createReadStream(filename)
+                images_file: context.fs.createReadStream(filename),
+                classifier_ids: "default,okonomiyaki_1741129835"
             }, function (err, response) {
                 if (err) {
                     console.log('error: ' + err);
