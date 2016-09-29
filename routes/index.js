@@ -143,7 +143,7 @@ var visualRecognition = function (content) {
             sendText('何が写ってるか解析します', content);
             context.visualRecognition.classify({
                 images_file: context.fs.createReadStream(filename),
-                classifier_ids: "default,okonomiyaki_1741129835"
+                classifier_ids: process.env.CLASSIFIER_IDS
             }, function (err, response) {
                 if (err) {
                     console.log('error: ' + err);
