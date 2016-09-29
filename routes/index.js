@@ -154,11 +154,7 @@ var visualRecognition = function (content) {
                         var classes = classifiers[i].classes;
                         for(var j=0;j<classes.length;j++){
                             if(msg!=""){ msg += "\n"; }
-                            if(classifiers[i].classifier_id == "default") {
-                                msg += classes[j].class + " (" + classes[j].score + ")";
-                            } else {
-                                msg += classifiers[i].name + " (" + classes[j].score + ")";
-                            }
+                            msg += classes[j].class + " (" + classes[j].score + ")";
                         }
                     }
                     if(msg==""){
