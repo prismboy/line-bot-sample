@@ -17,6 +17,7 @@ applications:
   - line-bot-statica
   - line-bot-visual-recognition
   env:
-    CHANNEL_ID: '1480997547'
-    CHANNEL_SECRET: 006cfdc027564f5bd0bf8374691261e1
-    MID: u250c355222bd5f8cab9e1d6cb278b3c3
+    CHANNEL_ID: '1486045455'
+    CHANNEL_SECRET: c6b3ca3b97d24e8b3ecdb0b040c6fb04
+    CHANNEL_ACCESS_TOKEN: DBUIsPfBvpc/JmUzbZukRdmvpe7CMWcqc3Ipaa5PM57npSsWd2qQiypvwBWJ6EZLBev9OrysYe2ddEgcIbhsjaEpewhxgA4w0Icmqh9XxmeIuzzElj5v+0qNo3QTZV2Tac6DpUZ15g9HO3oxy7CR5wdB04t89/1O/w1cDnyilFU=
+    CLASSIFIER_IDS: default,japanesefoods_328164025

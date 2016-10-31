@@ -5,9 +5,6 @@
  * @author Ippei SUZUKI
  */
 
-var STATICA_SERVICE_NAME = 'line-bot-statica';
-var VISUAL_RECOGNITION_SERVICE_NAME = 'line-bot-visual-recognition';
-
 // 環境変数を取得する。
 var cfenv = require('cfenv');
 var appEnv = cfenv.getAppEnv();
@@ -25,13 +22,16 @@ exports.path = require('path');
 exports.request = require('request');
 
 /** STATICA URL */
-var staticaCreds = appEnv.getServiceCreds(STATICA_SERVICE_NAME);
+var vcapServices = JSON.parse(process.env.VCAP_SERVICES);
+var staticaName = vcapServices.statica[0].name;
+var staticaCreds = appEnv.getServiceCreds(staticaName);
 exports.staticaUrl = staticaCreds.STATICA_URL;
 
 /** Watson Visual Recognition */
 // ref https://github.com/watson-developer-cloud/node-sdk
 var watson = require('watson-developer-cloud');
-var visualRecognitionCreds = appEnv.getServiceCreds(VISUAL_RECOGNITION_SERVICE_NAME);
+var visualRecognitionName = vcapServices.watson_vision_combined[0].name;
+var visualRecognitionCreds = appEnv.getServiceCreds(visualRecognitionName);
 var visualRecognition = watson.visual_recognition({
     api_key: visualRecognitionCreds.api_key,
     version: 'v3',
@@ -42,14 +42,12 @@ exports.visualRecognition = visualRecognition;
 /** LINE BOT API Header */
 exports.headers = {
     'Content-Type': 'application/json; charset=UTF-8',
-    'X-Line-ChannelID': process.env.CHANNEL_ID,
-    'X-Line-ChannelSecret': process.env.CHANNEL_SECRET,
-    'X-Line-Trusted-User-With-ACL': process.env.MID
+    'Authorization': 'Bearer ' + process.env.CHANNEL_ACCESS_TOKEN
 };
 
 /**
  * classify, detectFaces
  */
 exports.appSetting = {
-    recognizeMode : 'detectFaces'
+    recognizeMode : 'classify'
 }
