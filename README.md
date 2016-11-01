@@ -1,4 +1,4 @@
-﻿## (Message API対応版)
+﻿## (Messaging API対応版)
 # LINE BOT - Watson Visual Recognition - Detect faces & Classify
 
 ## はじめに  
