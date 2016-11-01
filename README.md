@@ -1,10 +1,22 @@
-# LINE BOT - Watson Visual Recognition - Detect faces & Classify
+﻿# (Message API対応版) LINE BOT - Watson Visual Recognition - Detect faces & Classify
 
 ## はじめに  
 LINE に顔写真やモノの写真を送信することで、IBM Bluemix の Visual Recogniton で 顔写真やモノの写真を判定して結果 (JSON) を返す CF アプリを実装しました。
 
 LINE BOT は Server IP Whitelist にコールバック・アプリケーションのIP アドレスを設定します。しかし、CFアプリの IP アドレスは起動毎に変わってしまい、固定にできません。そこで、次のサイトを参考に、Bluemix のサービス「Statica」(3rd party) を使用して Proxy を構成しました。 (師匠ありがとうございます。)  
+
 - http://dotnsf.blog.jp/archives/2016-04-15.html
+
+顔認識モードおよび分類認識はモードはcmd:modeコマンドにて切り替えます。
+(大文字・小文字どちらでもOK)
+
+|No.|モード|コマンド|備考|
+|:--|:-----|:-------|:---|
+|1|顔認識モード|cmd:mode:f||
+|2| 分類認識モード|cmd:mode:c|(ランタイム起動時のデフォルト)|
+|3|モード確認|cmd:current||
+|4|ヘルプ|cmd:help||
+
 
 ## 使い方
 LINE アプリの友だち追加で、以下の QR コードを読み込ませてください。  
@@ -13,47 +25,52 @@ LINE アプリの友だち追加で、以下の QR コードを読み込ませ�
 
 実行結果を以下に示します。
 
-![Samole](docs/sample.png)  
+|分類認識モード|顔認識モード|コマンド入力|
+|:-------------|:-------------|:-------------|
+|![Sample1 Classify](docs/result-classify.png)|![Sample2 DetectFace](docs/result-detectface.png)|![Sample3 Command](docs/result-command.png)|  
 
 ## セットアップ  
-1. 本サイトから line-bot アプリをダウンロード (Download ZIP) して解凍してください。ディレクトリ名は line-bot-master から line-bot に変更してください。
+1. 本サイトから line-bot アプリをダウンロード (Download ZIP) して解凍してください。ディレクトリ名は line-bot-sample-master から line-bot-sample に変更してください。
 
-1. Bluemix コンソールから CFアプリケーション (Node.js) を作成してください。以下の ippei0605 はご自身のユーザ名などに変更してください。  
-アプリケーション名: line-bot-ippei0605 (任意)  
+1. Bluemix コンソールから CFアプリケーション (Node.js) を作成してください。以下の sample はご自身のユーザ名などに変更してください。  
+アプリケーション名: line-bot-[yourname] (任意)  
 
-    > 以降、line-bot-ippei0605 で説明します。
+    > 以降、line-bot-foobar で説明します。
 
 
 1. CF コマンド・ライン・インターフェースをインストールしていない場合は、インストールしてください。
 
-1. Statica を作成し、line-bot-ippei0605 にバインドしてください。  
-サービス名: line-bot-statica (固定)  
+1. Statica を作成し、line-bot-foobar にバインドしてください。  
+サービス名: line-bot-statica (任意)  
 
-    > 名前を変更したい場合は、 utils/context.js の STATICA_SERVICE_NAME の設定値を変更してください。
+1. Visual Recognition を作成し、line-bot-foobar にバインドしてください。  
+サービス名: line-bot-visual-recognition (任意)  
 
-1. Visual Recognition を作成し、line-bot-ippei0605 にバインドしてください。  
-サービス名: line-bot-visual-recognition (固定)  
+1. 以下のサイトから、Developer Trial Account を登録してください。  
+https://business.line.me/
 
-    > 名前を変更したい場合は、 utils/context.js の VISUAL_RECOGNITION_SERVICE_NAME の設定値を変更してください。
+1. LINE@MANAGERを以下に示します。
+![LINE@MANAGER 1](docs/line-at-manager1.png)
+(続き)
+![LINE@MANAGER 2](docs/line-at-manager2.png)
 
-1. 以下のサイトから、BOT API Trial Account を登録してください。  
-https://business.line.me/services/products/4/introduction
+1. LINE Developers Basic Information を以下に示します。
+![LINE Basic Information1](docs/line-basic1.png)
+(続き)
+![LINE Basic Information2](docs/line-basic2.png)
 
-1. LINE BOT Basic Information を以下に示します。
-![LINE Basic Information](docs/line-basic.png)
-
-1. LINE BOT Server IP Whitelist は、Statica Dashboard の Setup に示されている Your Static IPs を登録してください。
+1. LINE Developers Server IP Whitelist は、Statica Dashboard の Setup に示されている Your Static IPs を登録してください。
 ![LINE Server IP Whitelist](docs/line-whitelist.png)  
 
 1. Bluemix コンソールから CF アプリの環境変数 (ユーザー定義) を設定します。LINE BOT Basic Information に従って設定してください。
-    - CHANNEL_ID : Channel ID
-    - CHANNEL_SECRET : Channel Secret
-    - MID : MID
+    - CHANNEL_ACCESS_TOKEN : Channel Access Token
     ![環境変数・ユーザー](docs/env.png)  
 
 1. 解凍したディレクトリ (line-bot アプリのホーム) に移動してください。
 
-        > cd line-bot
+        > cd line-bot-sample
+
+1. manifest.ymlを編集して、『applications』以下にある『name』および『host』にアプリケーション名(line-bot-foobar)を指定してください。
 
 1. Bluemixに接続してください。
 
@@ -62,11 +79,11 @@ https://business.line.me/services/products/4/introduction
 
 1. Bluemix にログインしてください。
 
-        > cf login -u e87782@jp.ibm.com -o e87782@jp.ibm.com -s dev
+        > cf login -u hogehoge@foo.bar.com -o hogehoge@foo.bar.com -s dev
 
 1. アプリをデプロイしてください。
 
-        > cf push line-bot-ippei0605
+        > cf push line-bot-foobar
 
 ## アプリの構成
 
@@ -81,11 +98,16 @@ https://business.line.me/services/products/4/introduction
     │  README.md
     │  
     ├─docs
-    │      env.png            readme.md の図: 環境変数 (ユーザー定義)
-    │      line-basic.png     readme.md の図: LINE Base Information
-    │      line-whitelist.png readme.md の図: LINE Server IP Whitelist
-    │      qr.png             readme.md の図: QR Code
-    │      sample.jpg         readme.md の図: 実行結果
+    │      env.png                readme.md の図: 環境変数 (ユーザー定義)
+    │      line-at-manager1.png   readme.md の図: LINE@MANAGER
+    │      line-at-manager2.png   readme.md の図: LINE@MANAGER (続き)
+    │      line-basic1.png        readme.md の図: LINE Base Information
+    │      line-basic2.png        readme.md の図: LINE Base Information (続き)
+    │      line-whitelist.png     readme.md の図: LINE Server IP Whitelist
+    │      qr.png                 readme.md の図: QR Code
+    │      result-classify.png    readme.md の図: 分類認識実行結果
+    │      result-detectface.png  readme.md の図: 顔認識実行結果
+    │      result-command.png     readme.md の図: コマンド実行結果
     │      
     ├─routes
     │      index.js           LINE BOT アプリのルーティング
