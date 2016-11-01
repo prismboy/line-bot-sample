@@ -1,4 +1,5 @@
-﻿# (Message API対応版) LINE BOT - Watson Visual Recognition - Detect faces & Classify
+﻿## (Message API対応版)
+# LINE BOT - Watson Visual Recognition - Detect faces & Classify
 
 ## はじめに  
 LINE に顔写真やモノの写真を送信することで、IBM Bluemix の Visual Recogniton で 顔写真やモノの写真を判定して結果 (JSON) を返す CF アプリを実装しました。
