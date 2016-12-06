@@ -5,9 +5,6 @@ declared-services:
   line-bot-visual-recognition:
     label: watson_vision_combined
     plan: free
-  Cloudant NoSQL DB-tf:
-    llabel: cloudantNoSQLDB
-    plan: Lite
 applications:
 - path: .
   memory: 512M
@@ -18,4 +15,3 @@ applications:
   services:
 #  - line-bot-statica
   - line-bot-visual-recognition
-  - Cloudant NoSQL DB-tf
