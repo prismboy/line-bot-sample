@@ -12,7 +12,6 @@ applications:
 - path: .
   memory: 512M
   instances: 1
-  domain: mybluemix.net
   name: line-bot-kevin0916
   host: line-bot-kevin0916
   disk_quota: 1024M
