@@ -44,7 +44,7 @@ var sendText = function (text, content) {
     var options = {
         method: 'POST',
         url: 'https://api.line.me/v2/bot/message/reply',
-        proxy: context.staticaUrl,
+        // proxy: context.staticaUrl,
         headers: context.headers,
         json: true,
         body: data
@@ -84,7 +84,7 @@ var cantRecognize = function (content) {
     var options = {
         method: 'POST',
         url: 'https://api.line.me/v2/bot/message/reply',
-        proxy: context.staticaUrl,
+        // proxy: context.staticaUrl,
         headers: context.headers,
         json: true,
         body: data
@@ -113,7 +113,7 @@ var visualRecognition = function (content) {
         "method": "GET",
         "url": 'https://api.line.me/v2/bot/message/' + id + '/content',
         "encoding": null,
-        "proxy": context.staticaUrl,
+        // "proxy": context.staticaUrl,
         "headers": {"Authorization": "Bearer " + process.env.CHANNEL_ACCESS_TOKEN}
     };
 

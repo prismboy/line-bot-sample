@@ -23,9 +23,9 @@ exports.request = require('request');
 
 /** STATICA URL */
 var vcapServices = JSON.parse(process.env.VCAP_SERVICES);
-var staticaName = vcapServices.statica[0].name;
-var staticaCreds = appEnv.getServiceCreds(staticaName);
-exports.staticaUrl = staticaCreds.STATICA_URL;
+// var staticaName = vcapServices.statica[0].name;
+// var staticaCreds = appEnv.getServiceCreds(staticaName);
+// exports.staticaUrl = staticaCreds.STATICA_URL;
 
 /** Watson Visual Recognition */
 // ref https://github.com/watson-developer-cloud/node-sdk

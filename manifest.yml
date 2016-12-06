@@ -1,10 +1,13 @@
 declared-services:
-  line-bot-statica:
-    label: statica
-    plan: starter
+#  line-bot-statica:
+#    label: statica
+#    plan: starter
   line-bot-visual-recognition:
     label: watson_vision_combined
     plan: free
+  Cloudant NoSQL DB-tf:
+    llabel: cloudantNoSQLDB
+    plan: Lite
 applications:
 - path: .
   memory: 512M
@@ -14,5 +17,6 @@ applications:
   host: line-bot-kevin0916
   disk_quota: 1024M
   services:
-  - line-bot-statica
+#  - line-bot-statica
   - line-bot-visual-recognition
+  - Cloudant NoSQL DB-tf
