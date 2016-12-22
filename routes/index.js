@@ -61,7 +61,6 @@ var sendText = function (text, content) {
 var getFilename = function (contentDisposition) {
     var temp;
     if(contentDisposition===undefined){
-        sendText("Bad Response!!\n'content-disposition' is undefined!");
         console.log("response.header 'content-disposition' is undefined!");
     } else {
         temp = contentDisposition.match(/^attachment; filename=\"(.*)\"$/);
