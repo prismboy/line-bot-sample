@@ -59,6 +59,11 @@ var sendText = function (text, content) {
 
 // Header 文字列からファイル名を取得する。
 var getFilename = function (contentDisposition) {
+	if(contentDisposition===undefined){
+		sendText("Bad Response!!\n'content-disposition' is undefined!");
+		console.log("response.header 'content-disposition' is undefined!");
+		return;
+	}
     var temp = contentDisposition.match(/^attachment; filename=\"(.*)\"$/);
     return temp ? temp[1] : 'default';
 }
@@ -119,15 +124,7 @@ var visualRecognition = function (content) {
 
     // LINE BOT API: Getting message content
     callLineBotApi(options, function (body, response) {
-    	if(response.headers.length < 1){
-    		sendText("Bad Response!!");
-    		console.log("response.headers = 0!");
-    		return;
-    	}
         // イメージファイルを保存する。 (Visual Recognitionに直接バイナリファイルを渡せないため)
-        for(var i = 0; i<response.headers.length;i++){
-            console.log("header["+i+"]: "+response.headers[i]);
-        }
         var filename = '../tmp/' + getFilename(response.headers['content-disposition']);
         context.fs.writeFileSync(filename, body);
         // Visual Recognition Detect faces
