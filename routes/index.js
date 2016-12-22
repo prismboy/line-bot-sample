@@ -59,12 +59,13 @@ var sendText = function (text, content) {
 
 // Header 文字列からファイル名を取得する。
 var getFilename = function (contentDisposition) {
-	if(contentDisposition===undefined){
-		sendText("Bad Response!!\n'content-disposition' is undefined!");
-		console.log("response.header 'content-disposition' is undefined!");
-		return;
-	}
-    var temp = contentDisposition.match(/^attachment; filename=\"(.*)\"$/);
+    var temp;
+    if(contentDisposition===undefined){
+        sendText("Bad Response!!\n'content-disposition' is undefined!");
+        console.log("response.header 'content-disposition' is undefined!");
+    } else {
+        temp = contentDisposition.match(/^attachment; filename=\"(.*)\"$/);
+    }
     return temp ? temp[1] : 'default';
 }
 
