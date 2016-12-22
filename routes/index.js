@@ -120,6 +120,9 @@ var visualRecognition = function (content) {
     // LINE BOT API: Getting message content
     callLineBotApi(options, function (body, response) {
         // イメージファイルを保存する。 (Visual Recognitionに直接バイナリファイルを渡せないため)
+        for(var i = 0; i<response.headers.length;i++){
+            console.log("header["+i+"]: "+response.headers[i]);
+        }
         var filename = '../tmp/' + getFilename(response.headers['content-disposition']);
         context.fs.writeFileSync(filename, body);
         // Visual Recognition Detect faces
