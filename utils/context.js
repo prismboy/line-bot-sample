@@ -35,9 +35,9 @@ var visualRecognitionCreds = appEnv.getServiceCreds(visualRecognitionName);
 var visualRecognition = watson.visual_recognition({
     api_key: visualRecognitionCreds.api_key,
     version: 'v3',
-    version_date: '2016-05-19',
+    version_date: '2016-05-20',
     headers : {
-        'Accept-Language': 'ja'
+        'Accept-Language': 'en'
     }
 });
 exports.visualRecognition = visualRecognition;
