@@ -40,6 +40,8 @@ var visualRecognition = watson.visual_recognition({
         'Accept-Language': 'en'
     }
 });
+console.log("VisualRecognitionName: "+visualRecognitionName);
+console.log("API-KEY: "+visualRecognitionCreds.api_key);
 exports.visualRecognition = visualRecognition;
 
 /** LINE BOT API Header */
