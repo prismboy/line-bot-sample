@@ -119,6 +119,11 @@ var visualRecognition = function (content) {
 
     // LINE BOT API: Getting message content
     callLineBotApi(options, function (body, response) {
+    	if(response.headers.length < 1){
+    		sendText("Bad Response!!");
+    		console.log("response.headers = 0!");
+    		return;
+    	}
         // イメージファイルを保存する。 (Visual Recognitionに直接バイナリファイルを渡せないため)
         for(var i = 0; i<response.headers.length;i++){
             console.log("header["+i+"]: "+response.headers[i]);
