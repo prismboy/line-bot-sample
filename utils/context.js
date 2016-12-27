@@ -32,8 +32,8 @@ var vcapServices = JSON.parse(process.env.VCAP_SERVICES);
 var watson = require('watson-developer-cloud');
 var visualRecognitionName = vcapServices.watson_vision_combined[0].name;
 var visualRecognitionCreds = appEnv.getServiceCreds(visualRecognitionName);
-console.log("API KEY: "+visualRecognitionCreds.api_key);
-console.log("VisualRecognitionName: "+visualRecognitionName);
+// console.log("API KEY: "+visualRecognitionCreds.api_key);
+// console.log("VisualRecognitionName: "+visualRecognitionName);
 var visualRecognition = watson.visual_recognition({
     api_key: visualRecognitionCreds.api_key,
     version: 'v3',
