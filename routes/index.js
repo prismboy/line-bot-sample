@@ -13,7 +13,7 @@ var crypto = require("crypto");
 // LINE BOT API を呼出す。
 var callLineBotApi = function (options, callback) {
     context.request(options, function (error, response, body) {
-        if (!error && response.statusCode == 200) {
+        if (!error && response.statusCode === 200) {
             callback(body, response);
         } else {
             console.log('error: ' + JSON.stringify(error));
@@ -66,7 +66,7 @@ var getFilename = function (contentDisposition) {
         temp = contentDisposition.match(/^attachment; filename=\"(.*)\"$/);
     }
     return temp ? temp[1] : 'default';
-}
+};
 
 // 解析不可時のメッセージ
 var cantRecognize = function (content) {
@@ -108,7 +108,7 @@ var verifyRequest = function(request) {
     var hmac = crypto.createHmac('sha512', key);
     hmac.update(request.body);
     return hmac.digest('base64') === key;
-}
+};
 
 // 画像認識
 var visualRecognition = function (content) {
@@ -140,7 +140,7 @@ var visualRecognition = function (content) {
                     var faces = response.images[0].faces;
 
                     for(var i=0;i<faces.length;i++){
-                        if(msg != "") msg += "\n";
+                        if(msg !== "") msg += "\n";
                         msg = msg + "性別 : " + faces[i].gender.gender + " (" + faces[i].gender.score + ")\n";
                         msg += "年齢 : ";
                         if(faces[i].age.min != undefined) {
@@ -155,7 +155,7 @@ var visualRecognition = function (content) {
                             msg = msg + "名前 : " + faces[i].identity.name + " (" + faces[i].identity.score + ")";
                         }
                     }
-                    if(msg==""){
+                    if(msg===""){
                         cantRecognize(content);
                     } else {
                         sendText(msg,content);
@@ -176,11 +176,11 @@ var visualRecognition = function (content) {
                     for(var i=0;i<classifiers.length;i++){
                         var classes = classifiers[i].classes;
                         for(var j=0;j<classes.length;j++){
-                            if(msg!=""){ msg += "\n"; }
+                            if(msg!==""){ msg += "\n"; }
                             msg += classes[j].class + " (" + classes[j].score + ")";
                         }
                     }
-                    if(msg==""){
+                    if(msg===""){
                         cantRecognize(content);
                     } else {
                         sendText(msg,content);
@@ -223,16 +223,16 @@ exports.callback = function (req, res) {
 
     // ref https://developers.line.me/bot-api/api-reference#receiving_messages
     var content = req.body.events[0];
-    if (content.message.type == "text") {
+    if (content.message.type === "text") {
         // text
         if (content.message.text.toLowerCase().indexOf('cmd:') > -1) {
             textCmd(content);
         } else {
             sendText('会話は今勉強中だからちょっと待って', content);
         }
-    } else if (content.message.type == "image") {
+    } else if (content.message.type === "image") {
         // images
-        visualRecognition(content)
+        visualRecognition(content);
     } else {
         //other
         sendText('写真を送ってください。', content);
