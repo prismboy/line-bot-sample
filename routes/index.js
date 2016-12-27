@@ -222,7 +222,7 @@ exports.callback = function (req, res) {
     }
 
     // ref https://developers.line.me/bot-api/api-reference#receiving_messages
-    if (req.body.events.length === 0){
+    if (req.body.events === undefined){
         sendText('no-content',content);
         return;
     }
