@@ -222,6 +222,11 @@ exports.callback = function (req, res) {
     }
 
     // ref https://developers.line.me/bot-api/api-reference#receiving_messages
+    if (req.body.events === "undefined"){
+        sendText('no-content',content);
+        return;
+    }
+
     var content = req.body.events[0];
     if (content.message.type === "text") {
         // text
