@@ -223,6 +223,7 @@ exports.callback = function (req, res) {
 
     // ref https://developers.line.me/bot-api/api-reference#receiving_messages
     if (req.body.events === undefined){
+        content.replyToken = 'no-reply-token';
         sendText('no-content',content);
         return;
     }
