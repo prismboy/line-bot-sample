@@ -1,17 +1,13 @@
 declared-services:
-#  line-bot-statica:
-#    label: statica
-#    plan: starter
   line-bot-visual-recognition:
     label: watson_vision_combined
     plan: free
 applications:
 - path: .
-  memory: 512M
+  memory: 256M
   instances: 1
-  name: line-bot-kevin0916
-  host: line-bot-kevin0916
+  name: line-bot-kevin20170110
+  host: line-bot-kevin20170110
   disk_quota: 1024M
   services:
-#  - line-bot-statica
   - line-bot-visual-recognition
