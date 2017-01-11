@@ -129,7 +129,7 @@ var visualRecognition = function (content) {
 
     // LINE BOT API: Getting message content
     callLineBotApi(options, function (body, response) {
-        console.log('response: ' + JSON.stringify(response));
+        console.log('response: ' + JSON.stringify(response.headers));
         // イメージファイルを保存する。 (Visual Recognitionに直接バイナリファイルを渡せないため)
         var filename = '../tmp/' + getFilename(response.headers['content-disposition']);
         context.fs.writeFileSync(filename, body);
