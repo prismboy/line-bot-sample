@@ -67,13 +67,13 @@ var getFilename = function (contentDisposition) {
     } else {
         temp = contentDisposition.match(/^attachment; filename=\"(.*)\"$/);
     }
-    return temp ? temp[1] : 'default';
+    return temp ? temp[1] : 'default.jpg';
 };
 
 // 解析不可時のメッセージ
 var cantRecognize = function (content) {
     var data = {
-        'replyToken': content.replyToken,
+        "to": content.source.userId,
         "messages": [
             {
                 "type": "text",
@@ -90,9 +90,11 @@ var cantRecognize = function (content) {
     //オプションを定義する。
     var options = {
         method: 'POST',
-        url: 'https://api.line.me/v2/bot/message/reply',
-        // proxy: context.staticaUrl,
-        headers: context.headers,
+        url: 'https://api.line.me/v2/bot/message/push',
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + process.env.CHANNEL_ACCESS_TOKEN
+        },
         json: true,
         body: data
     };
@@ -127,6 +129,7 @@ var visualRecognition = function (content) {
 
     // LINE BOT API: Getting message content
     callLineBotApi(options, function (body, response) {
+        console.log('response: ' + JSON.stringify(response));
         // イメージファイルを保存する。 (Visual Recognitionに直接バイナリファイルを渡せないため)
         var filename = '../tmp/' + getFilename(response.headers['content-disposition']);
         context.fs.writeFileSync(filename, body);
