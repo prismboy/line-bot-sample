@@ -47,7 +47,7 @@ var sendText = function (text, content) {
         headers: {
             "Content-Type": "application/json",
             "Authorization": "Bearer " + process.env.CHANNEL_ACCESS_TOKEN
-        }
+        },
         json: true,
         body: data
     };
