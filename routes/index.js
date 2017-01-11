@@ -26,7 +26,7 @@ var callLineBotApi = function (options, callback) {
 var sendText = function (text, content) {
     // 送信データを作成する。
     var data = {
-        'replyToken': content.replyToken,
+        "to": content.source.userId,
         "messages": [
             {
                 "type": "text",
@@ -43,9 +43,11 @@ var sendText = function (text, content) {
     //オプションを定義する。
     var options = {
         method: 'POST',
-        url: 'https://api.line.me/v2/bot/message/reply',
-        // proxy: context.staticaUrl,
-        headers: context.headers,
+        url: 'https://api.line.me/v2/bot/message/push',
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + process.env.CHANNEL_ACCESS_TOKEN
+        }
         json: true,
         body: data
     };
@@ -118,8 +120,9 @@ var visualRecognition = function (content) {
         "method": "GET",
         "url": 'https://api.line.me/v2/bot/message/' + id + '/content',
         "encoding": null,
-        // "proxy": context.staticaUrl,
-        "headers": {"Authorization": "Bearer " + process.env.CHANNEL_ACCESS_TOKEN}
+        "headers": {
+            "Authorization": "Bearer " + process.env.CHANNEL_ACCESS_TOKEN
+        }
     };
 
     // LINE BOT API: Getting message content
@@ -243,4 +246,8 @@ exports.callback = function (req, res) {
         //other
         sendText('写真を送ってください。', content);
     }
+};
+
+exports.index = function(req, res){
+    res.sendStatus(200);
 };

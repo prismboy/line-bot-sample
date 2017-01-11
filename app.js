@@ -24,6 +24,7 @@ app.use(express.static(__dirname + '/public'));
 // ルートを設定する。
 app.post('/callback', routes.callback);
 app.get('/callback', routes.callback);
+app.get('/', routes.index);
 
 // リクエトを受付ける。
 app.listen(context.appEnv.port, '0.0.0.0', function() {
