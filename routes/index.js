@@ -23,10 +23,10 @@ var callLineBotApi = function (options, callback) {
 };
 
 // テキストメッセージを送信する。
-var pushMessage = function (text, content) {
+var pushMsg = function (text, event) {
     // 送信データを作成する。
     var data = {
-        "to": content.source.userId,
+        "to": event.source.userId,
         "messages": [
             {
                 "type": "text",
@@ -60,20 +60,14 @@ var pushMessage = function (text, content) {
 
 
 // Header 文字列からファイル名を取得する。
-var getFilename = function (contentDisposition) {
-    var temp;
-    if(contentDisposition===undefined){
-        console.log("response.header 'content-disposition' is undefined!");
-    } else {
-        temp = contentDisposition.match(/^attachment; filename=\"(.*)\"$/);
-    }
-    return temp ? temp[1] : 'default.jpg';
+var getFilename = function (contentType, reqId) {
+    return reqId + "." + contentType.replace("image\/","");
 };
 
 // 解析不可時のメッセージ
-var cantRecognize = function (content) {
+var cantRecognize = function (event) {
     var data = {
-        "to": content.source.userId,
+        "to": event.source.userId,
         "messages": [
             {
                 "type": "text",
@@ -115,8 +109,8 @@ var verifyRequest = function(request) {
 };
 
 // 画像認識
-var recognize = function (content) {
-    var id = content.message.id;
+var visualRecognition = function (event) {
+    var id = event.message.id;
     // 送信オプションを定義
     var options = {
         "method": "GET",
@@ -129,19 +123,19 @@ var recognize = function (content) {
 
     // LINE BOT API: Getting message content
     callLineBotApi(options, function (body, response) {
-        // console.log('response.headers: ' + JSON.stringify(response.headers));
+        console.log('response: ' + JSON.stringify(response.headers));
         // イメージファイルを保存する。 (Visual Recognitionに直接バイナリファイルを渡せないため)
-        var filename = '../tmp/' + getFilename(response.headers['content-disposition']);
+        var filename = '../tmp/' + getFilename(response.headers['content-type'], response.headers['x-line-request-id');
         context.fs.writeFileSync(filename, body);
         // Visual Recognition Detect faces
         if (context.appSetting.recognizeMode === 'detectFaces'){
-            // pushMessage("顔を認識中です", content);
+            pushMessage("顔を認識中です", event);
             context.visualRecognition.detectFaces({
                 images_file: context.fs.createReadStream(filename)
             }, function (err, response) {
                 if (err) {
                     console.log('error: ' + err);
-                    cantRecognize(content);
+                    cantRecognize(event);
                 } else {
                     var msg = "";
                     var faces = response.images[0].faces;
@@ -163,21 +157,21 @@ var recognize = function (content) {
                         }
                     }
                     if(msg===""){
-                        cantRecognize(content);
+                        cantRecognize(event);
                     } else {
-                        pushMessage(msg,content);
+                        pushMsg(msg,event);
                     }
                 }
             });
         } else {
-            pushMessage("画像を分類中です", content);
+            pushMessage("画像を分類中です", event);
             context.visualRecognition.classify({
                 images_file: context.fs.createReadStream(filename),
                 classifier_ids: process.env.CLASSIFIER_IDS
             }, function (err, response) {
                 if (err) {
                     console.log('error: ' + err);
-                    cantRecognize(content);
+                    cantRecognize(event);
                 } else {
                     var classifiers = response.images[0].classifiers;
                     var msg = "";
@@ -189,9 +183,9 @@ var recognize = function (content) {
                         }
                     }
                     if(msg===""){
-                        cantRecognize(content);
+                        cantRecognize(event);
                     } else {
-                        pushMessage(msg,content);
+                        pushMsg(msg,event);
                     }
                 }
             });
@@ -199,54 +193,56 @@ var recognize = function (content) {
     });
 };
 
-var textCmd = function (content) {
-    if (content.message.text.toLowerCase().indexOf('help') > -1){
-        pushMessage('cmdのリスト\n' +
+
+var textCmd = function (event) {
+    if (event.message.text.toLowerCase().indexOf('help') > -1){
+        pushMsg('cmdのリスト\n' +
             'current - 現在のモードを表示\n' +
             'mode:f - 顔認識モード\n' +
-            'mode:c - 分類認識モード', content);
-    } else if (content.message.text.toLowerCase().indexOf('current') > -1){
-        pushMessage(JSON.stringify(context.appSetting), content);
-    } else if (content.message.text.toLowerCase().indexOf('mode:f') > -1){
+            'mode:c - 分類認識モード', event);
+    } else if (event.message.text.toLowerCase().indexOf('current') > -1){
+        pushMsg(JSON.stringify(context.appSetting), event);
+    } else if (event.message.text.toLowerCase().indexOf('mode:f') > -1){
         context.appSetting.recognizeMode = 'detectFaces';
-        pushMessage(JSON.stringify(context.appSetting), content);
-    } else if (content.message.text.toLowerCase().indexOf('mode:c') > -1){
+        pushMsg(JSON.stringify(context.appSetting), event);
+    } else if (event.message.text.toLowerCase().indexOf('mode:c') > -1){
         context.appSetting.recognizeMode = 'classify';
-        pushMessage(JSON.stringify(context.appSetting), content);
+        pushMsg(JSON.stringify(context.appSetting), event);
     } else {
-        pushMessage("cmd:helpでコマンドを確認してください",content);
+        pushMsg("cmd:helpでコマンドを確認してください",event);
     }
 };
+
 
 /** LINE から呼び出されるコールバック */
 exports.callback = function (req, res) {
     // リクエストがLINE Platformから送信されたものか検証する。
     if ( !verifyRequest ) {
         console.log('検証エラー: 不正なリクエストです。');
-        pushMessage('検証エラー: 不正なリクエストです。');
+        pushMsg('検証エラー: 不正なリクエストです。');
         return;
     }
 
     // ref https://developers.line.me/bot-api/api-reference#receiving_messages
     if (req.body.events === undefined){
-        res.sendStatus(200);
+        res.sendStatus(500);
         return;
     }
 
-    var content = req.body.events[0];
-    if (content.message.type === "text") {
+    var event = req.body.events[0];
+    if (event.message.type === "text") {
         // text
-        if (content.message.text.toLowerCase().indexOf('cmd:') > -1) {
-            textCmd(content);
+        if (event.message.text.toLowerCase().indexOf('cmd:') > -1) {
+            textCmd(event);
         } else {
-            pushMessage('会話は今勉強中だからちょっと待って', content);
+            pushMsg('会話は今勉強中だからちょっと待って', event);
         }
-    } else if (content.message.type === "image") {
+    } else if (event.message.type === "image") {
         // images
-        recognize(content);
+        visualRecognition(event);
     } else {
         //other
-        pushMessage('写真を送ってください。', content);
+        pushMsg('写真を送ってください。', event);
     }
 };
 
