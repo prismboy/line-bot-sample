@@ -23,7 +23,7 @@ var callLineBotApi = function (options, callback) {
 };
 
 // テキストメッセージを送信する。
-var sendText = function (text, content) {
+var pushMessage = function (text, content) {
     // 送信データを作成する。
     var data = {
         "to": content.source.userId,
@@ -109,7 +109,7 @@ var verifyRequest = function(request) {
 };
 
 // 画像認識
-var visualRecognition = function (content) {
+var recognize = function (content) {
     var id = content.message.id;
     // 送信オプションを定義
     var options = {
@@ -123,12 +123,13 @@ var visualRecognition = function (content) {
 
     // LINE BOT API: Getting message content
     callLineBotApi(options, function (body, response) {
-        console.log('response: ' + JSON.stringify(response.headers));
+        // console.log('response.headers: ' + JSON.stringify(response.headers));
         // イメージファイルを保存する。 (Visual Recognitionに直接バイナリファイルを渡せないため)
         var filename = '../tmp/' + getFilename(response.headers['content-type'], response.headers['x-line-request-id']);
         context.fs.writeFileSync(filename, body);
         // Visual Recognition Detect faces
         if (context.appSetting.recognizeMode === 'detectFaces'){
+            pushMessage("顔を認識中です", context);
             context.visualRecognition.detectFaces({
                 images_file: context.fs.createReadStream(filename)
             }, function (err, response) {
@@ -158,11 +159,12 @@ var visualRecognition = function (content) {
                     if(msg===""){
                         cantRecognize(content);
                     } else {
-                        sendText(msg,content);
+                        pushMessage(msg,content);
                     }
                 }
             });
         } else {
+            pushMessage("画像を分類中です", context);
             context.visualRecognition.classify({
                 images_file: context.fs.createReadStream(filename),
                 classifier_ids: process.env.CLASSIFIER_IDS
@@ -183,7 +185,7 @@ var visualRecognition = function (content) {
                     if(msg===""){
                         cantRecognize(content);
                     } else {
-                        sendText(msg,content);
+                        pushMessage(msg,content);
                     }
                 }
             });
@@ -191,40 +193,37 @@ var visualRecognition = function (content) {
     });
 };
 
-
 var textCmd = function (content) {
     if (content.message.text.toLowerCase().indexOf('help') > -1){
-        sendText('cmdのリスト\n' +
+        pushMessage('cmdのリスト\n' +
             'current - 現在のモードを表示\n' +
             'mode:f - 顔認識モード\n' +
             'mode:c - 分類認識モード', content);
     } else if (content.message.text.toLowerCase().indexOf('current') > -1){
-        sendText(JSON.stringify(context.appSetting), content);
+        pushMessage(JSON.stringify(context.appSetting), content);
     } else if (content.message.text.toLowerCase().indexOf('mode:f') > -1){
         context.appSetting.recognizeMode = 'detectFaces';
-        sendText(JSON.stringify(context.appSetting), content);
+        pushMessage(JSON.stringify(context.appSetting), content);
     } else if (content.message.text.toLowerCase().indexOf('mode:c') > -1){
         context.appSetting.recognizeMode = 'classify';
-        sendText(JSON.stringify(context.appSetting), content);
+        pushMessage(JSON.stringify(context.appSetting), content);
     } else {
-        sendText("cmd:helpでコマンドを確認してください",content);
+        pushMessage("cmd:helpでコマンドを確認してください",content);
     }
 };
-
 
 /** LINE から呼び出されるコールバック */
 exports.callback = function (req, res) {
     // リクエストがLINE Platformから送信されたものか検証する。
     if ( !verifyRequest ) {
         console.log('検証エラー: 不正なリクエストです。');
-        sendText('検証エラー: 不正なリクエストです。');
+        pushMessage('検証エラー: 不正なリクエストです。');
         return;
     }
 
     // ref https://developers.line.me/bot-api/api-reference#receiving_messages
     if (req.body.events === undefined){
-        content.replyToken = 'no-reply-token';
-        sendText('no-content',content);
+        res.sendStatus(200);
         return;
     }
 
@@ -234,14 +233,14 @@ exports.callback = function (req, res) {
         if (content.message.text.toLowerCase().indexOf('cmd:') > -1) {
             textCmd(content);
         } else {
-            sendText('会話は今勉強中だからちょっと待って', content);
+            pushMessage('会話は今勉強中だからちょっと待って', content);
         }
     } else if (content.message.type === "image") {
         // images
-        visualRecognition(content);
+        recognize(content);
     } else {
         //other
-        sendText('写真を送ってください。', content);
+        pushMessage('写真を送ってください。', content);
     }
 };
 
