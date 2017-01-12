@@ -31,11 +31,6 @@ var pushMsg = function (text, event) {
             {
                 "type": "text",
                 "text": text
-            },
-            {
-                "type": "sticker",
-                "packageId": "1",
-                "stickerId": "13"
             }
         ]
     };
@@ -58,6 +53,36 @@ var pushMsg = function (text, event) {
     });
 };
 
+var pushSticker = function(packageId, stickerId, event) {
+    // 送信データを作成する。
+    var data = {
+        "to": event.source.userId,
+        "messages": [
+            {
+                "type": "sticker",
+                "packageId": packageId,
+                "stickerId": stickerId
+            }
+        ]
+    };
+
+    //オプションを定義する。
+    var options = {
+        method: 'POST',
+        url: 'https://api.line.me/v2/bot/message/push',
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + process.env.CHANNEL_ACCESS_TOKEN
+        },
+        json: true,
+        body: data
+    };
+
+    // LINE BOT API: Sending messages (Text)
+    callLineBotApi(options, function (body) {
+        console.log(body);
+    });
+};
 
 // Header 文字列からファイル名を取得する。
 var getFilename = function (contentType, reqId) {
@@ -72,11 +97,6 @@ var cantRecognize = function (event) {
             {
                 "type": "text",
                 "text": "申し訳ありません。\n解析できませんでした。"
-            },
-            {
-                "type": "sticker",
-                "packageId": "1",
-                "stickerId": "107"
             }
         ]
     };
@@ -136,6 +156,8 @@ var recognize = function (event) {
                 if (err) {
                     console.log('error: ' + err);
                     cantRecognize(event);
+                    pushSticker("1", "107", event);
+            }
                 } else {
                     var msg = "";
                     var faces = response.images[0].faces;
@@ -158,8 +180,10 @@ var recognize = function (event) {
                     }
                     if(msg===""){
                         cantRecognize(event);
+                        pushSticker("1", "107", event);
                     } else {
                         pushMsg(msg,event);
+                        puchSticker("1", "13", event);
                     }
                 }
             });
@@ -172,6 +196,7 @@ var recognize = function (event) {
                 if (err) {
                     console.log('error: ' + err);
                     cantRecognize(event);
+                    pushSticker("1", "107", event);
                 } else {
                     var classifiers = response.images[0].classifiers;
                     var msg = "";
@@ -184,8 +209,10 @@ var recognize = function (event) {
                     }
                     if(msg===""){
                         cantRecognize(event);
+                        pushSticker("1", "107", event);
                     } else {
                         pushMsg(msg,event);
+                        puchSticker("1", "13", event);
                     }
                 }
             });
@@ -236,6 +263,7 @@ exports.callback = function (req, res) {
             textCmd(event);
         } else {
             pushMsg('会話は今勉強中だからちょっと待って', event);
+            pushSticker("1", "107", event);
         }
     } else if (event.message.type === "image") {
         // images
@@ -243,6 +271,7 @@ exports.callback = function (req, res) {
     } else {
         //other
         pushMsg('写真を送ってください。', event);
+        pushSticker("1", "107", event);
     }
 };
 
