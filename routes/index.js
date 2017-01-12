@@ -135,7 +135,7 @@ var recognize = function (content) {
         context.fs.writeFileSync(filename, body);
         // Visual Recognition Detect faces
         if (context.appSetting.recognizeMode === 'detectFaces'){
-            pushMessage("顔を認識中です", context);
+            // pushMessage("顔を認識中です", content);
             context.visualRecognition.detectFaces({
                 images_file: context.fs.createReadStream(filename)
             }, function (err, response) {
@@ -170,7 +170,7 @@ var recognize = function (content) {
                 }
             });
         } else {
-            pushMessage("画像を分類中です", context);
+            pushMessage("画像を分類中です", content);
             context.visualRecognition.classify({
                 images_file: context.fs.createReadStream(filename),
                 classifier_ids: process.env.CLASSIFIER_IDS
