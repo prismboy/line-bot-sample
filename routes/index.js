@@ -60,8 +60,14 @@ var pushMessage = function (text, content) {
 
 
 // Header 文字列からファイル名を取得する。
-var getFilename = function (contentType, requestId) {
-    return requestId + '.' + contentType.replace('image\/','');
+var getFilename = function (contentDisposition) {
+    var temp;
+    if(contentDisposition===undefined){
+        console.log("response.header 'content-disposition' is undefined!");
+    } else {
+        temp = contentDisposition.match(/^attachment; filename=\"(.*)\"$/);
+    }
+    return temp ? temp[1] : 'default.jpg';
 };
 
 // 解析不可時のメッセージ
@@ -125,7 +131,7 @@ var recognize = function (content) {
     callLineBotApi(options, function (body, response) {
         // console.log('response.headers: ' + JSON.stringify(response.headers));
         // イメージファイルを保存する。 (Visual Recognitionに直接バイナリファイルを渡せないため)
-        var filename = '../tmp/' + getFilename(response.headers['content-type'], response.headers['x-line-request-id']);
+        var filename = '../tmp/' + getFilename(response.headers['content-disposition']);
         context.fs.writeFileSync(filename, body);
         // Visual Recognition Detect faces
         if (context.appSetting.recognizeMode === 'detectFaces'){
