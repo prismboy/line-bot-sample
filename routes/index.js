@@ -157,7 +157,6 @@ var recognize = function (event) {
                     console.log('error: ' + err);
                     cantRecognize(event);
                     pushSticker("1", "107", event);
-            }
                 } else {
                     var msg = "";
                     var faces = response.images[0].faces;
@@ -183,7 +182,7 @@ var recognize = function (event) {
                         pushSticker("1", "107", event);
                     } else {
                         pushMsg(msg,event);
-                        puchSticker("1", "13", event);
+                        pushSticker("1", "13", event);
                     }
                 }
             });
@@ -212,7 +211,7 @@ var recognize = function (event) {
                         pushSticker("1", "107", event);
                     } else {
                         pushMsg(msg,event);
-                        puchSticker("1", "13", event);
+                        pushSticker("1", "13", event);
                     }
                 }
             });
