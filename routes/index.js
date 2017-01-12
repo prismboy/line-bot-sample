@@ -23,7 +23,7 @@ var callLineBotApi = function (options, callback) {
 };
 
 // テキストメッセージを送信する。
-var pushMsg = function (text, event) {
+var pushMsg = function (text, packageId, stickerId, event) {
     // 送信データを作成する。
     var data = {
         "to": event.source.userId,
@@ -35,36 +35,15 @@ var pushMsg = function (text, event) {
         ]
     };
 
-    //オプションを定義する。
-    var options = {
-        method: 'POST',
-        url: 'https://api.line.me/v2/bot/message/push',
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + process.env.CHANNEL_ACCESS_TOKEN
-        },
-        json: true,
-        body: data
-    };
-
-    // LINE BOT API: Sending messages (Text)
-    callLineBotApi(options, function (body) {
-        console.log(body);
-    });
-};
-
-var pushSticker = function(packageId, stickerId, event) {
-    // 送信データを作成する。
-    var data = {
-        "to": event.source.userId,
-        "messages": [
-            {
-                "type": "sticker",
-                "packageId": packageId,
-                "stickerId": stickerId
-            }
-        ]
-    };
+    if(packageId!=="" && stickerId!==""){
+      data.messages.push(
+        {
+          "type": "sticker",
+          "packageId": packageId,
+          "stickerId": stickerId
+        }
+      )
+    }
 
     //オプションを定義する。
     var options = {
@@ -91,32 +70,7 @@ var getFilename = function (contentType, reqId) {
 
 // 解析不可時のメッセージ
 var cantRecognize = function (event) {
-    var data = {
-        "to": event.source.userId,
-        "messages": [
-            {
-                "type": "text",
-                "text": "申し訳ありません。\n解析できませんでした。"
-            }
-        ]
-    };
-
-    //オプションを定義する。
-    var options = {
-        method: 'POST',
-        url: 'https://api.line.me/v2/bot/message/push',
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + process.env.CHANNEL_ACCESS_TOKEN
-        },
-        json: true,
-        body: data
-    };
-
-    // LINE BOT API: Sending messages (Text)
-    callLineBotApi(options, function (body) {
-        console.log(body);
-    });
+    pushMsg("申し訳ありません。\n解析できませんでした。", "1", "107", event);
 };
 
 // リクエストがLINE Platformから送信されたものであるかを検証する
@@ -149,14 +103,13 @@ var recognize = function (event) {
         context.fs.writeFileSync(filename, body);
         // Visual Recognition Detect faces
         if (context.appSetting.recognizeMode === 'detectFaces'){
-            pushMsg("顔を認識中です", event);
+            pushMsg("顔を認識中です", "", "", event);
             context.visualRecognition.detectFaces({
                 images_file: context.fs.createReadStream(filename)
             }, function (err, response) {
                 if (err) {
                     console.log('error: ' + err);
                     cantRecognize(event);
-                    pushSticker("1", "107", event);
                 } else {
                     var msg = "";
                     var faces = response.images[0].faces;
@@ -179,15 +132,13 @@ var recognize = function (event) {
                     }
                     if(msg===""){
                         cantRecognize(event);
-                        pushSticker("1", "107", event);
                     } else {
-                        pushMsg(msg,event);
-                        pushSticker("1", "13", event);
+                        pushMsg(msg, "1", "13", event);
                     }
                 }
             });
         } else {
-            pushMsg("画像を分類中です", event);
+            pushMsg("画像を分類中です", "", "", event);
             context.visualRecognition.classify({
                 images_file: context.fs.createReadStream(filename),
                 classifier_ids: process.env.CLASSIFIER_IDS
@@ -195,7 +146,6 @@ var recognize = function (event) {
                 if (err) {
                     console.log('error: ' + err);
                     cantRecognize(event);
-                    pushSticker("1", "107", event);
                 } else {
                     var classifiers = response.images[0].classifiers;
                     var msg = "";
@@ -208,10 +158,8 @@ var recognize = function (event) {
                     }
                     if(msg===""){
                         cantRecognize(event);
-                        pushSticker("1", "107", event);
                     } else {
-                        pushMsg(msg,event);
-                        pushSticker("1", "13", event);
+                        pushMsg(msg, "1", "13", event);
                     }
                 }
             });
@@ -225,17 +173,17 @@ var textCmd = function (event) {
         pushMsg('cmdのリスト\n' +
             'current - 現在のモードを表示\n' +
             'mode:f - 顔認識モード\n' +
-            'mode:c - 分類認識モード', event);
+            'mode:c - 分類認識モード', "", "", event);
     } else if (event.message.text.toLowerCase().indexOf('current') > -1){
-        pushMsg(JSON.stringify(context.appSetting), event);
+        pushMsg(JSON.stringify(context.appSetting), "", "", event);
     } else if (event.message.text.toLowerCase().indexOf('mode:f') > -1){
         context.appSetting.recognizeMode = 'detectFaces';
-        pushMsg(JSON.stringify(context.appSetting), event);
+        pushMsg(JSON.stringify(context.appSetting), "", "", event);
     } else if (event.message.text.toLowerCase().indexOf('mode:c') > -1){
         context.appSetting.recognizeMode = 'classify';
-        pushMsg(JSON.stringify(context.appSetting), event);
+        pushMsg(JSON.stringify(context.appSetting), "", "", event);
     } else {
-        pushMsg("cmd:helpでコマンドを確認してください",event);
+        pushMsg("cmd:helpでコマンドを確認してください", "", "", event);
     }
 };
 
@@ -245,7 +193,7 @@ exports.callback = function (req, res) {
     // リクエストがLINE Platformから送信されたものか検証する。
     if ( !verifyRequest ) {
         console.log('検証エラー: 不正なリクエストです。');
-        pushMsg('検証エラー: 不正なリクエストです。');
+        res.sendStatus(500);
         return;
     }
 
@@ -261,16 +209,14 @@ exports.callback = function (req, res) {
         if (event.message.text.toLowerCase().indexOf('cmd:') > -1) {
             textCmd(event);
         } else {
-            pushMsg('会話は今勉強中だからちょっと待って', event);
-            pushSticker("1", "107", event);
+            pushMsg('会話は今勉強中だからちょっと待って', "1", "107", event);
         }
     } else if (event.message.type === "image") {
         // images
         recognize(event);
     } else {
         //other
-        pushMsg('写真を送ってください。', event);
-        pushSticker("1", "107", event);
+        pushMsg('写真を送ってください。', "1", "107", event);
     }
 };
 
