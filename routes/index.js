@@ -109,7 +109,7 @@ var verifyRequest = function(request) {
 };
 
 // 画像認識
-var visualRecognition = function (event) {
+var recognize = function (event) {
     var id = event.message.id;
     // 送信オプションを定義
     var options = {
@@ -239,7 +239,7 @@ exports.callback = function (req, res) {
         }
     } else if (event.message.type === "image") {
         // images
-        visualRecognition(event);
+        recognize(event);
     } else {
         //other
         pushMsg('写真を送ってください。', event);
