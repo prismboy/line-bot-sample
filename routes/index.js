@@ -26,7 +26,7 @@ var callLineBotApi = function (options, callback) {
 var pushMessage = function (text, content) {
     // 送信データを作成する。
     var data = {
-        // "to": content.source.userId,
+        "to": content.source.userId,
         "messages": [
             {
                 "type": "text",
