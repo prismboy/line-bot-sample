@@ -125,7 +125,7 @@ var recognize = function (event) {
     callLineBotApi(options, function (body, response) {
         console.log('response: ' + JSON.stringify(response.headers));
         // イメージファイルを保存する。 (Visual Recognitionに直接バイナリファイルを渡せないため)
-        var filename = '../tmp/' + getFilename(response.headers['content-type'], response.headers['x-line-request-id');
+        var filename = '../tmp/' + getFilename(response.headers['content-type'], response.headers['x-line-request-id']);
         context.fs.writeFileSync(filename, body);
         // Visual Recognition Detect faces
         if (context.appSetting.recognizeMode === 'detectFaces'){
