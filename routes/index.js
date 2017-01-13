@@ -97,10 +97,10 @@ var recognize = function (event) {
 
     // LINE BOT API: Getting message content
     callLineBotApi(options, function (body, response) {
-        console.log('response: ' + JSON.stringify(response.headers));
         // イメージファイルを保存する。 (Visual Recognitionに直接バイナリファイルを渡せないため)
         var filename = '../tmp/' + getFilename(response.headers['content-type'], response.headers['x-line-request-id']);
         context.fs.writeFileSync(filename, body);
+
         // Visual Recognition Detect faces
         if (context.appSetting.recognizeMode === 'detectFaces'){
             pushMsg("顔を認識中です", "", "", event);
@@ -120,10 +120,14 @@ var recognize = function (event) {
                         msg += "年齢 : ";
                         if(faces[i].age.min != undefined) {
                              msg += faces[i].age.min;
+                        } else {
+                          msg += "?";
                         }
                         msg += "-";
                         if(faces[i].age.max != undefined) {
                             msg += faces[i].age.max;
+                        } else {
+                          msg += "?";
                         }
                         msg += " (" + faces[i].age.score + ")\n";
                         if(faces[i].identity != undefined){
@@ -167,7 +171,7 @@ var recognize = function (event) {
     });
 };
 
-
+// コマンドモード処理
 var textCmd = function (event) {
     if (event.message.text.toLowerCase().indexOf('help') > -1){
         pushMsg('cmdのリスト\n' +
@@ -186,7 +190,6 @@ var textCmd = function (event) {
         pushMsg("cmd:helpでコマンドを確認してください", "", "", event);
     }
 };
-
 
 /** LINE から呼び出されるコールバック */
 exports.callback = function (req, res) {
