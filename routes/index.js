@@ -168,6 +168,9 @@ var recognize = function (event) {
                 }
             });
         }
+        context.fs.unlink(filename, function(err){
+          if(err) console.log(JSON.stringify(err));
+        });
     });
 };
 
