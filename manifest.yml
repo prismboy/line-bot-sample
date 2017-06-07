@@ -1,13 +1,16 @@
 declared-services:
-  line-bot-visual-recognition:
+  Visual Recognition-cm:
     label: watson_vision_combined
     plan: free
 applications:
 - path: .
   memory: 256M
   instances: 1
-  name: line-bot-kevin20170110
-  host: line-bot-kevin20170110
+  name: B20-O900156-line-bot
+  host: line-bot-demo-jiec-rd
   disk_quota: 1024M
   services:
-  - line-bot-visual-recognition
+  - Visual Recognition-cm
+  env:
+    CHANNEL_ACCESS_TOKEN: DBUIsPfBvpc/JmUzbZukRdmvpe7CMWcqc3Ipaa5PM57npSsWd2qQiypvwBWJ6EZLBev9OrysYe2ddEgcIbhsjaEpewhxgA4w0Icmqh9XxmeIuzzElj5v+0qNo3QTZV2Tac6DpUZ15g9HO3oxy7CR5wdB04t89/1O/w1cDnyilFU=
+    CLASSIFIER_IDS: default,KansaiSoulFood_1641851013
